@@ -279,7 +279,8 @@
       });
       if (!response.ok) throw new Error('Failed to load from JSONBin');
       const data = await response.json();
-      return data.record || null;
+      const record = data.record || null;
+      return record ? { timestamp: record.timestamp || 0, nodes: record.nodes, edges: record.edges } : null;
     } catch (e) {
       console.warn("No se pudo leer estado desde JSONBin:", e);
       return null;
@@ -288,6 +289,7 @@
 
 
   async function saveState(payload) {
+    const fullPayload = { timestamp: Date.now(), ...payload };
     try {
       const response = await fetch(JSONBIN_URL, {
         method: 'PUT',
@@ -295,12 +297,14 @@
           'Content-Type': 'application/json',
           'X-Master-Key': JSONBIN_MASTER_KEY
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(fullPayload)
       });
       if (!response.ok) throw new Error('Failed to save to JSONBin');
       console.log("Estado guardado en JSONBin");
+      return fullPayload.timestamp;
     } catch (e) {
       console.warn("No se pudo guardar estado en JSONBin:", e);
+      return null;
     }
   }
 
