@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Constelaciones - Camila Sosa Villada (mejorado)</title>
+  <title>Constelaciones - Experimentooctubre</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&display=swap" rel="stylesheet">
@@ -202,10 +202,10 @@
 
   // ---------- DATOS INICIALES (con constelación y nodo de ejemplo) ----------
   const initialConfs = ["Constelación Inicial"];
-  let STORAGE_KEY = "camila_vanguardia_graph_v4";
+  let STORAGE_KEY = "experimentooctubre_graph_v1";
 
   // JSONBin.io configuración para almacenamiento compartido
-  const JSONBIN_BIN_ID = "68f1bec7d0ea881f40a74c2c";
+  const JSONBIN_BIN_ID = "68f6bd45d0ea881f40af633b";
   const JSONBIN_MASTER_KEY = "$2a$10$AoE2D4tCJtIc0kTx.0iL6OUrN6byqzt3tQLc9h9xS4VEztgkSj1ca";
   const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
 
@@ -213,128 +213,57 @@
   // start with example constellation and node
   let nodes_data = [
     {
-      id: 501,
-      label: "Donna Haraway",
-      info: "Filósofa, bióloga y teórica feminista estadounidense. Su trabajo se centra en el pensamiento posthumano, el feminismo tecnocientífico, la ecología y las narrativas que desestabilizan las jerarquías entre humanos y no-humanos. En 'Seguir con el problema' propone modos de pensar y vivir en el Antropoceno desde la simbiosis, la colaboración y la imaginación especulativa.",
-      notes: "Nodo central; figura teórica que articula toda la constelación.",
-      constellation: "Métodos posthumanos - Haraway",
-      physics: true,
-      fixed: false,
-      x: 500,
-      y: 80
-    },
-    {
-      id: 502,
-      label: "Seguir con el problema (2016)",
-      info: "Obra clave de Haraway donde plantea la necesidad de 'hacer parientes' más allá de los límites de especie. Propone abandonar la nostalgia por un mundo perdido y enfrentar el presente desde la interdependencia, la vulnerabilidad compartida y la creatividad multispecie. Introduce el concepto de 'Chthuluceno' como alternativa al Antropoceno y Capitaloceno.",
-      notes: "Texto guía del seminario; combina teoría, ficción y especulación.",
-      constellation: "Métodos posthumanos - Haraway",
+      id: 1,
+      label: "Experimento Octubre",
+      info: "Un proyecto de exploración creativa y colaborativa iniciado en octubre. Busca conectar ideas, arte y pensamiento a través de constelaciones interactivas.",
+      notes: "Nodo central del proyecto.",
+      constellation: "Constelación Inicial",
       physics: true,
       fixed: false,
       x: 500,
       y: 200
     },
     {
-      id: 503,
-      label: "Chthuluceno",
-      info: "Término propuesto por Haraway para describir una era en la que los seres humanos reconocen su imbricación con múltiples formas de vida. Es una época de interdependencia y coevolución, no de dominación. En lugar de pensar el fin del mundo, propone pensar los modos de continuar en medio de los colapsos.",
-      notes: "Nodo conceptual que desplaza la idea del Antropoceno.",
-      constellation: "Métodos posthumanos - Haraway",
-      physics: true,
-      fixed: false,
-      x: 700,
-      y: 320
-    },
-    {
-      id: 504,
-      label: "Hacer parientes (Make kin)",
-      info: "Haraway propone reemplazar la lógica genealógica y biológica por una ética de parentesco extendido: crear vínculos con humanos y no-humanos, materiales y simbólicos. 'Hacer parientes' implica una práctica política y afectiva de cuidado más allá de la familia tradicional.",
-      notes: "Nodo ético y relacional central.",
-      constellation: "Métodos posthumanos - Haraway",
+      id: 2,
+      label: "Creatividad",
+      info: "La capacidad de generar ideas nuevas y originales. En este contexto, se explora a través de conexiones inesperadas y narrativas especulativas.",
+      notes: "Concepto clave para el experimento.",
+      constellation: "Constelación Inicial",
       physics: true,
       fixed: false,
       x: 300,
-      y: 320
+      y: 350
     },
     {
-      id: 505,
-      label: "Métodos posthumanos",
-      info: "Perspectiva metodológica que desborda el enfoque humanista clásico. Combina etnografía, narración especulativa, materialismo feminista y teoría actor-red. Busca comprender cómo los humanos y no-humanos co-producen mundos y conocimientos.",
-      notes: "Nodo epistemológico vinculado al seminario.",
-      constellation: "Métodos posthumanos - Haraway",
-      physics: true,
-      fixed: false,
-      x: 500,
-      y: 440
-    },
-    {
-      id: 506,
-      label: "Narración especulativa",
-      info: "Haraway utiliza la ficción y la especulación como herramientas de pensamiento. A través de relatos como el de las 'niñas del compost', propone imaginar futuros posibles en los que las fronteras entre especies se disuelven. La especulación se convierte en un método crítico.",
-      notes: "Nodo narrativo y metodológico.",
-      constellation: "Métodos posthumanos - Haraway",
-      physics: true,
-      fixed: false,
-      x: 300,
-      y: 560
-    },
-    {
-      id: 507,
-      label: "Etnografía no-humana",
-      info: "Metodología emergente que expande la etnografía clásica para incluir agencias no-humanas: animales, plantas, tecnologías, objetos. Se inspira en Haraway y Latour para pensar cómo los no-humanos participan en la construcción de lo social.",
-      notes: "Nodo metodológico conectado al seminario y a Haraway.",
-      constellation: "Métodos posthumanos - Haraway",
+      id: 3,
+      label: "Colaboración",
+      info: "Trabajo conjunto entre personas para crear algo mayor. Este proyecto invita a múltiples voces y perspectivas.",
+      notes: "Aspecto social del experimento.",
+      constellation: "Constelación Inicial",
       physics: true,
       fixed: false,
       x: 700,
-      y: 560
+      y: 350
     },
     {
-      id: 508,
-      label: "Crítica al antropocentrismo",
-      info: "Haraway cuestiona la centralidad del humano como medida de todas las cosas. Propone una ontología relacional en la que las fronteras entre humano, animal, máquina y vegetal se tornan porosas. Esta crítica es base para los métodos posthumanos.",
-      notes: "Nodo teórico-crítico clave.",
-      constellation: "Métodos posthumanos - Haraway",
+      id: 4,
+      label: "Constelaciones",
+      info: "Representaciones visuales de conexiones entre ideas, como estrellas en el cielo. Aquí se usan para mapear pensamientos y relaciones.",
+      notes: "Metáfora central del proyecto.",
+      constellation: "Constelación Inicial",
       physics: true,
       fixed: false,
       x: 500,
-      y: 680
-    },
-    {
-      id: 509,
-      label: "Pensamiento tentacular",
-      info: "Imagen conceptual que Haraway toma del pulpo y de las redes micorrícicas. El pensamiento tentacular es rizomático, no lineal, y permite pensar conexiones imprevisibles entre seres, tiempos y materiales. Contrasta con la lógica jerárquica del pensamiento occidental.",
-      notes: "Nodo poético y epistémico.",
-      constellation: "Métodos posthumanos - Haraway",
-      physics: true,
-      fixed: false,
-      x: 500,
-      y: 800
-    },
-    {
-      id: 510,
-      label: "Responsabilidad y compost",
-      info: "El compost funciona como metáfora material del entrelazamiento vital. 'Ser compost' significa asumir responsabilidad por los residuos, los restos, las continuidades. Haraway propone pensar la existencia como una práctica colectiva de recomposición constante.",
-      notes: "Nodo ético-ecológico que cierra la constelación.",
-      constellation: "Métodos posthumanos - Haraway",
-      physics: true,
-      fixed: false,
-      x: 500,
-      y: 920
+      y: 500
     }
   ];
 
   let edges_data = [
-    { from: 501, to: 502, id: "edge-501-502" },
-    { from: 502, to: 503, id: "edge-502-503" },
-    { from: 502, to: 504, id: "edge-502-504" },
-    { from: 501, to: 505, id: "edge-501-505" },
-    { from: 505, to: 506, id: "edge-505-506" },
-    { from: 505, to: 507, id: "edge-505-507" },
-    { from: 505, to: 508, id: "edge-505-508" },
-    { from: 508, to: 509, id: "edge-508-509" },
-    { from: 509, to: 510, id: "edge-509-510" },
-    { from: 504, to: 510, id: "edge-504-510" }
+    { from: 1, to: 2, id: "edge-1-2" },
+    { from: 1, to: 3, id: "edge-1-3" },
+    { from: 1, to: 4, id: "edge-1-4" },
+    { from: 2, to: 4, id: "edge-2-4" },
+    { from: 3, to: 4, id: "edge-3-4" }
   ];
 
 
