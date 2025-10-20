@@ -378,14 +378,31 @@
 
   // ---------- datasets (vis) ----------
   // each node will have: id, label, info, notes, constellation, physics (true/false), fixed (object or false), x,y optional
-  // Always use initial data, ignoring saved state from JSONBin
-  nodes_data = nodes_data.map(n => ({
-    ...n,
-    constellation: n.constellation || initialConfs[0],
-    color: typeof n.color === "string" ? n.color : n.color?.background || "#fff1e3",
-    physics: n.physics !== false
-  }));
-  // edges_data remains as initial
+  const saved = await loadState();
+  const hasSavedNodes = Array.isArray(saved?.nodes) && saved.nodes.length > 0;
+  const hasSavedEdges = Array.isArray(saved?.edges) && saved.edges.length > 0;
+
+  if (hasSavedNodes) {
+    // restore structure from saved (ensure defaults)
+    nodes_data = saved.nodes.map(n => ({
+      ...n,
+      constellation: n.constellation || initialConfs[0],
+      color: typeof n.color === "string" ? n.color : n.color?.background || "#fff1e3",
+      physics: n.physics !== false
+    }));
+  } else {
+    // enrich bundled nodes with defaults (physics true)
+    nodes_data = nodes_data.map(n => ({
+      ...n,
+      constellation: n.constellation || initialConfs[0],
+      color: typeof n.color === "string" ? n.color : n.color?.background || "#fff1e3",
+      physics: n.physics !== false
+    }));
+  }
+
+  if (hasSavedEdges) {
+    edges_data = saved.edges;
+  }
 
 
   const container = document.getElementById("mynetwork");
@@ -1195,8 +1212,106 @@ function openOverlay(nodeId, pointer) {
   refreshConstellationOptions();
 
 
+  // ---------- Collaborative editing: periodic sync ----------
+  // Poll for changes every 10 seconds to enable collaborative editing
+  setInterval(async () => {
+    try {
+      const latest = await loadState();
+      if (!latest || !latest.nodes || !latest.edges) return;
+
+      const currentNodes = nodes.get();
+      const currentEdges = edges.get();
+
+      // Normalize and sort for comparison
+      const normalizeNode = n => ({
+        id: n.id,
+        label: n.label,
+        info: n.info,
+        notes: n.notes || "",
+        color: n.color,
+        constellation: n.constellation,
+        physics: n.physics,
+        fixed: n.fixed,
+        x: n.x,
+        y: n.y
+      });
+
+      const latestNodesStr = JSON.stringify(latest.nodes.map(normalizeNode).sort((a, b) => a.id - b.id));
+      const currentNodesStr = JSON.stringify(currentNodes.map(normalizeNode).sort((a, b) => a.id - b.id));
+
+      const latestEdgesStr = JSON.stringify(latest.edges.map(e => ({ from: e.from, to: e.to, id: e.id })).sort((a, b) => a.id.localeCompare(b.id)));
+      const currentEdgesStr = JSON.stringify(currentEdges.map(e => ({ from: e.from, to: e.to, id: e.id })).sort((a, b) => a.id.localeCompare(b.id)));
+
+      let updated = false;
+
+      if (latestNodesStr !== currentNodesStr) {
+        nodes.clear();
+        nodes.add(latest.nodes.map(n => {
+          const copy = { ...n, color: { background: n.color || "#fff1e3" } };
+          if (copy.fixed === true) copy.fixed = { x: true, y: true };
+          return copy;
+        }));
+        refreshConstellationOptions();
+        ensureGroupSeparation();
+        updated = true;
+      }
+
+      if (latestEdgesStr !== currentEdgesStr) {
+        edges.clear();
+        edges.add(latest.edges);
+        updated = true;
+      }
+
+      if (updated) {
+        console.log("Sincronizado con cambios colaborativos");
+        // Reset selection if node was removed
+        if (activeNodeId && !nodes.get(activeNodeId)) {
+          updateEditorForSelection(null);
+        }
+      }
+    } catch (e) {
+      console.warn("Error en sincronización colaborativa:", e);
+    }
+  }, 10000); // Sync every 10 seconds
+
+
+  // ---------- Manual sync button ----------
+  // Add a sync button to the editor panel
+  const syncBtn = document.createElement("button");
+  syncBtn.textContent = "🔄 Sincronizar ahora";
+  syncBtn.style.marginTop = "10px";
+  syncBtn.addEventListener("click", async () => {
+    syncBtn.textContent = "Sincronizando...";
+    syncBtn.disabled = true;
+    try {
+      const latest = await loadState();
+      if (latest && latest.nodes && latest.edges) {
+        nodes.clear();
+        edges.clear();
+        nodes.add(latest.nodes.map(n => {
+          const copy = { ...n, color: { background: n.color || "#fff1e3" } };
+          if (copy.fixed === true) copy.fixed = { x: true, y: true };
+          return copy;
+        }));
+        edges.add(latest.edges);
+        refreshConstellationOptions();
+        ensureGroupSeparation();
+        updateEditorForSelection(null); // Reset selection
+        setMessage(storageMessage, "Sincronizado ✓", 2000);
+      } else {
+        setMessage(storageMessage, "No hay datos para sincronizar", 2000);
+      }
+    } catch (e) {
+      setMessage(storageMessage, "Error al sincronizar", 2000);
+    }
+    syncBtn.textContent = "🔄 Sincronizar ahora";
+    syncBtn.disabled = false;
+  });
+  document.querySelector(".editor-panel .section:last-child").appendChild(syncBtn);
+
+
   // done
-  console.log("Constelaciones cargadas. Redes listas.");
+  console.log("Constelaciones cargadas. Modo colaborativo activado.");
 });// <-- This closes the DOMContentLoaded function
 </script>
 </body>
