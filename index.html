@@ -205,7 +205,7 @@
   let STORAGE_KEY = "experimentooctubre_graph_v1";
 
   // JSONBin.io configuración para almacenamiento compartido
-  const JSONBIN_BIN_ID = "68f6bd45d0ea881f40af633b";
+  const JSONBIN_BIN_ID = "68f6d50bd0ea881f40af878d";
   const JSONBIN_MASTER_KEY = "$2a$10$AoE2D4tCJtIc0kTx.0iL6OUrN6byqzt3tQLc9h9xS4VEztgkSj1ca";
   const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
 
@@ -431,12 +431,16 @@
     const payload = {
       nodes: nodes.get().map(n => ({
         id: n.id, label: n.label, info: n.info, notes: n.notes || "",
-        color: n.color || "#fff1e3",
+        color: n.color?.background || "#fff1e3",
         constellation: n.constellation || initialConfs[0],
         physics: (n.physics !== false),
         fixed: !!(n.fixed && (n.fixed.x === true || n.fixed === true)),
         x: (n.x != null ? n.x : undefined),
-        y: (n.y != null ? n.y : undefined)
+        y: (n.y != null ? n.y : undefined),
+        image: n.image || "",
+        audio: n.audio || "",
+        video: n.video || "",
+        link: n.link || ""
       })),
       edges: edges.get().map(e => ({ from: e.from, to: e.to, id: e.id }))
     };
@@ -956,7 +960,22 @@ function openOverlay(nodeId, pointer) {
 
   // ---------- Export / Import / Reset ----------
   exportBtn.addEventListener("click", () => {
-    const payload = { nodes: nodes.get(), edges: edges.get() };
+    const payload = {
+      nodes: nodes.get().map(n => ({
+        id: n.id, label: n.label, info: n.info, notes: n.notes || "",
+        color: n.color?.background || "#fff1e3",
+        constellation: n.constellation || initialConfs[0],
+        physics: (n.physics !== false),
+        fixed: !!(n.fixed && (n.fixed.x === true || n.fixed === true)),
+        x: (n.x != null ? n.x : undefined),
+        y: (n.y != null ? n.y : undefined),
+        image: n.image || "",
+        audio: n.audio || "",
+        video: n.video || "",
+        link: n.link || ""
+      })),
+      edges: edges.get().map(e => ({ from: e.from, to: e.to, id: e.id }))
+    };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "constelaciones_export.json"; a.click();
@@ -1155,7 +1174,7 @@ function openOverlay(nodeId, pointer) {
       const currentNodes = nodes.get();
       const currentEdges = edges.get();
 
-      // Normalize and sort for comparison
+      // Normalize and sort for comparison (exclude x,y to avoid position mismatches)
       const normalizeNode = n => ({
         id: n.id,
         label: n.label,
@@ -1164,9 +1183,7 @@ function openOverlay(nodeId, pointer) {
         color: n.color,
         constellation: n.constellation,
         physics: n.physics,
-        fixed: n.fixed,
-        x: n.x,
-        y: n.y
+        fixed: n.fixed
       });
 
       const latestNodesStr = JSON.stringify(latest.nodes.map(normalizeNode).sort((a, b) => a.id - b.id));
@@ -1178,15 +1195,20 @@ function openOverlay(nodeId, pointer) {
       let updated = false;
 
       if (latestNodesStr !== currentNodesStr) {
-        nodes.clear();
-        nodes.add(latest.nodes.map(n => {
-          const copy = { ...n, color: { background: n.color || "#fff1e3" } };
-          if (copy.fixed === true) copy.fixed = { x: true, y: true };
-          return copy;
-        }));
-        refreshConstellationOptions();
-        ensureGroupSeparation();
-        updated = true;
+        // Prevent overwriting if local has more nodes (e.g., save failed previously)
+        if (latest.nodes.length < currentNodes.length) {
+          console.log("Local has more nodes than remote, skipping overwrite to prevent data loss");
+        } else {
+          nodes.clear();
+          nodes.add(latest.nodes.map(n => {
+            const copy = { ...n, color: { background: n.color || "#fff1e3" } };
+            if (copy.fixed === true) copy.fixed = { x: true, y: true };
+            return copy;
+          }));
+          refreshConstellationOptions();
+          ensureGroupSeparation();
+          updated = true;
+        }
       }
 
       if (latestEdgesStr !== currentEdgesStr) {
