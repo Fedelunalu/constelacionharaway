@@ -444,7 +444,7 @@
       })),
       edges: edges.get().map(e => ({ from: e.from, to: e.to, id: e.id }))
     };
-    saveState(payload);
+    saveState(payload).then(ts => { localTimestamp = ts; }).catch(e => console.warn("Save failed", e));
   }
 
 
@@ -1287,4 +1287,5 @@ function openOverlay(nodeId, pointer) {
 </script>
 </body>
 </html>
+
 
