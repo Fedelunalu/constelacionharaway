@@ -636,7 +636,7 @@ saveNodeBtn.addEventListener("click", () => {
   const fixedChecked = nodeFixedInput.checked;
 
 
-  const color = nodeColorInput.value;
+  const color = { background: nodeColorInput.value };
   const update = { id: activeNodeId, label, info, notes, color, image, audio, video, link, physics };
   if (fixedChecked) {
     // get position and fix there
