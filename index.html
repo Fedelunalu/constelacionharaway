@@ -600,7 +600,7 @@ function updateEditorForSelection(nodeId) {
   nodeLabelInput.value = n.label || "";
   nodeInfoInput.value = n.info || "";
   nodeNotesInput.value = n.notes || "";
-  nodeColorInput.value = n.color || "#fff1e3";
+  nodeColorInput.value = (typeof n.color === 'string' ? n.color : n.color?.background) || "#fff1e3";
   nodeImageInput.value = n.image || "";
   nodeAudioInput.value = n.audio || "";
   nodeVideoInput.value = n.video || "";
