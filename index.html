@@ -141,8 +141,10 @@
       <div class="section">
         <h2>Guardar / Reset</h2>
         <div style="display:flex;gap:8px;">
+          <button id="saveBtn">Guardar cambios</button>
           <button id="exportJSON">Exportar JSON</button>
           <button id="importJSON">Importar JSON</button>
+          <button id="deleteConstellationBtn">Borrar constelación</button>
           <button id="resetBtn">Resetear</button>
         </div>
         <p class="message" id="storageMessage"></p>
@@ -1246,8 +1248,8 @@ function openOverlay(nodeId, pointer) {
   }, 30000); // Sync every 30 seconds
 
 
-  // ---------- Manual sync button ----------
-  // Add a sync button to the editor panel
+  // ---------- Manual sync button (merge changes) ----------
+  // Add a sync button to the editor panel that merges new nodes/edges without overwriting existing ones
   const syncBtn = document.createElement("button");
   syncBtn.textContent = "🔄 Sincronizar ahora";
   syncBtn.style.marginTop = "10px";
@@ -1257,18 +1259,36 @@ function openOverlay(nodeId, pointer) {
     try {
       const latest = await loadState();
       if (latest && latest.nodes && latest.edges) {
-        nodes.clear();
-        edges.clear();
-        nodes.add(latest.nodes.map(n => {
-          const copy = { ...n, color: { background: n.color || "#fff1e3" } };
-          if (copy.fixed === true) copy.fixed = { x: true, y: true };
-          return copy;
-        }));
-        edges.add(latest.edges);
-        refreshConstellationOptions();
-        ensureGroupSeparation();
-        updateEditorForSelection(null); // Reset selection
-        setMessage(storageMessage, "Sincronizado ✓", 2000);
+        // Merge logic: add new nodes/edges, don't overwrite existing
+        const currentNodes = nodes.get();
+        const currentEdges = edges.get();
+        const currentNodeIds = new Set(currentNodes.map(n => n.id));
+        const currentEdgeIds = new Set(currentEdges.map(e => e.id));
+
+        // Add new nodes that don't exist locally
+        const newNodes = latest.nodes.filter(n => !currentNodeIds.has(n.id));
+        if (newNodes.length > 0) {
+          nodes.add(newNodes.map(n => {
+            const copy = { ...n, color: { background: n.color || "#fff1e3" } };
+            if (copy.fixed === true) copy.fixed = { x: true, y: true };
+            return copy;
+          }));
+        }
+
+        // Add new edges that don't exist locally
+        const newEdges = latest.edges.filter(e => !currentEdgeIds.has(e.id));
+        if (newEdges.length > 0) {
+          edges.add(newEdges);
+        }
+
+        if (newNodes.length > 0 || newEdges.length > 0) {
+          refreshConstellationOptions();
+          ensureGroupSeparation();
+          updateEditorForSelection(null); // Reset selection
+          setMessage(storageMessage, `Sincronizado: +${newNodes.length} nodos, +${newEdges.length} enlaces`, 3000);
+        } else {
+          setMessage(storageMessage, "Ya está sincronizado", 2000);
+        }
       } else {
         setMessage(storageMessage, "No hay datos para sincronizar", 2000);
       }
